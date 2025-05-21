@@ -1,0 +1,32 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+import time
+import csv
+
+options = Options()
+options.add_argument('--headless')
+driver = webdriver.Chrome(options=options)
+
+url = "https://www.olx.in/items/q-car-cover"
+driver.get(url)
+time.sleep(5)
+
+items = driver.find_elements(By.CSS_SELECTOR, 'li.EIR5N')
+
+results = []
+for item in items:
+    try:
+        title = item.find_element(By.CSS_SELECTOR, 'span._2tW1I').text
+        price = item.find_element(By.CSS_SELECTOR, 'span._89yzn').text
+        results.append([title, price])
+    except:
+        continue
+
+# Write to CSV
+with open('olx_car_covers.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Title', 'Price'])
+    writer.writerows(results)
+
+driver.quit()
